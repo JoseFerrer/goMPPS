@@ -1,0 +1,12 @@
+{
+	"MWLPath": "C:/Users/mari/Documents/Resocentro/xml_dcm/",
+	"DBMWL": "C:/Users/mari/Documents/Resocentro/DB_MWL/",
+	"Index": "C:/Users/mari/Documents/Resocentro/Index/",
+	"executable": "C:/Users/mari/Documents/dcm4che-5.14.0/bin/findscu ",
+	"PACSAETitle": "DCM4CHEE",
+	"PACSIP": "192.168.1.36",
+	"PACSPort": "11112",
+	"NroTag": "00100010",
+	"OptionsTags": "-r 00080050 -r 0020000E -r 0020000D -r 00080031 -r 00080021 -r 00081030 -r 0008103E -r 00200011 -r 00180015 -r 00201209 -r 00081010",
+	"JSONMPPSPath": "C:/Users/mari/Documents/Resocentro/DB_MPPS/"
+}
