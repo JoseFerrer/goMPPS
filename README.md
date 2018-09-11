@@ -1,5 +1,5 @@
 # goMPPS
-Dicom MPPS API for Mirth Connect usign [MirthConnect] (https://www.nextgen.com/products-and-services/integration-engine) and [dcm4chee tool kit] (https://sourceforge.net/projects/dcm4che/files/dcm4chee-arc-light5/)
+Dicom MPPS API for Mirth Connect usign [MirthConnect](https://www.nextgen.com/products-and-services/integration-engine) and [dcm4chee tool kit](https://sourceforge.net/projects/dcm4che/files/dcm4chee-arc-light5/)
 
 ## Modules
 
