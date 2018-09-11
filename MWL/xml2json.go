@@ -133,6 +133,7 @@ func main() {
 	mwl_path := confFile.MwlPath
 	db_mwl := confFile.DBMwl
 	ind_path := confFile.Index
+	elapsedT := time.Duration(confFile.ElapsedTime) * time.Minute
 
 	for {
 		files := get_filename(mwl_path, db_mwl, ind_path)
@@ -143,6 +144,6 @@ func main() {
 		}
 
 		// Set time to wait 5 Minutes
-		time.Sleep(5 * time.Minute)
+		time.Sleep(elapsedT)
 	}
 }
