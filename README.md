@@ -1,16 +1,34 @@
 # goMPPS
-Dicom MPPS API for Mirth Connect usign MirthConnect
+Dicom MPPS API for Mirth Connect usign [MirthConnect] (https://www.nextgen.com/products-and-services/integration-engine) and [dcm4chee tool kit] (https://sourceforge.net/projects/dcm4che/files/dcm4chee-arc-light5/)
 
 ## Modules
 
+* MWL: Query Modality WorkList Module to Database
+* C-FIND: Query c-Find Module for MPPS
 
 ## Get c-find studies
+
 
 
 ## Get Modality WorkList
 
 
+
 ## Configuration JSON
+
+This JSON provide to Modules the configuration for Modules
+
+* MWLPath: File Path where Mirth Connect save the XML file coming from RIS
+* DBMWL: Modality WorkList JSON database
+* Index: Study Index database
+* executable: Path of dcm4chee findscu
+* PACSAETitle: AETitle of PACS target
+* PACSIP: PACS target IP
+* PACSPort: PACS target port
+* NroTag: DICOM Tag for matching key
+* OptionsTags: DICOMs Tag for Specify returning key
+* JSONMPPSPath: MPPS JSON database
+* ElapsedTime: Time for Queries to Database
 
 ```
 {
@@ -27,3 +45,7 @@ Dicom MPPS API for Mirth Connect usign MirthConnect
 	"ElapsedTime": 1
 }
 ```
+
+## License
+
+This project is licensed under the MIT License
