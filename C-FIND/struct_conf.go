@@ -31,6 +31,7 @@ type ConfigMPPS struct {
 	NroTag       string
 	OptionsTags  string
 	JSONMppsPath string
+	ElapsedTime  int
 }
 
 // Tagdcm Struct of DICOM tags to get from C-FIND

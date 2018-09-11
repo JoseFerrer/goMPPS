@@ -10,9 +10,6 @@ import (
 	"time"
 )
 
-// Constant
-const pathConfig = "configuration.json"
-
 func main() {
 
 	// ***************** Open configuration file and set MPPS options *******************************
@@ -41,10 +38,11 @@ func main() {
 	comando1 := ejecutable + "-c " + pacsaetitle + "@" + ip + ":" + port + " -m " + Tag + "="
 	// *****************************************************************************************
 
-	// ******************************* Set Paths: MWL, MPPS ************************************
+	// ************************ Set Paths: MWL, MPPS, ElapsedTime ******************************
 	dbmwl := confFile.DBMwl
 	dbmpps := confFile.JSONMppsPath
 	indexdb := confFile.Index
+	elapsedT := time.Duration(confFile.ElapsedTime) * time.Minute
 	// *****************************************************************************************
 
 	num := 0
@@ -92,7 +90,7 @@ func main() {
 				fmt.Println("The command has been executed: ", comando)
 
 				// ********************** Dicom validation query *********************************
-				validResp := valResponse(RespStdout, "status=ff00H")
+				validResp := valResponse(RespStdout, respFromPacs)
 
 				// Revisar logica del valResponse no le hace a todos
 				if validResp != "Study not found" {
@@ -102,25 +100,25 @@ func main() {
 					// Id Series
 					datos.IDSeries = int(num)
 					// Get AccessionNumber ("0008,0050")
-					datos.AccessionNumber = extractMsn(RespStdout, "0008,0050")
+					datos.AccessionNumber = extractMsn(RespStdout, TagAccession)
 					// Get SeriesInstanceUID ("0020,000E")
-					datos.SeriesInstanceUID = extractMsn(RespStdout, "0020,000E")
+					datos.SeriesInstanceUID = extractMsn(RespStdout, TagSeriesInUID)
 					// Get StudyInstanceUID ("0020,000D")
-					datos.StudyInstanceUID = extractMsn(RespStdout, "0020,000D")
+					datos.StudyInstanceUID = extractMsn(RespStdout, TagStudyInsUID)
 					// Get SeriesTime ("0008,0031")
-					datos.SeriesTime = extractMsn(RespStdout, "0008,0031")
+					datos.SeriesTime = extractMsn(RespStdout, TagSeriesTime)
 					// Get SeriesDate ("0008,0021")
-					datos.SeriesDate = extractMsn(RespStdout, "0008,0021")
+					datos.SeriesDate = extractMsn(RespStdout, TagSeriesDate)
 					// Get StudyDescription ("0008,1030")
-					datos.StudyDescription = extractMsn(RespStdout, "0008,1030")
+					datos.StudyDescription = extractMsn(RespStdout, TagStudyDesc)
 					// Get SeriesDescription ("0008,103E")
-					datos.SeriesDescription = extractMsn(RespStdout, "0008,103E")
+					datos.SeriesDescription = extractMsn(RespStdout, TagSeriesDesc)
 					// Get SeriesNumber ("0020,0011")
-					datos.SeriesNumber = extractMsn(RespStdout, "0020,0011")
+					datos.SeriesNumber = extractMsn(RespStdout, TagSeriesN)
 					// Get BodyPartExamined ("0018,0015")
-					datos.BodyPartExamined = extractMsn(RespStdout, "0018,0015")
+					datos.BodyPartExamined = extractMsn(RespStdout, TagBodyPart)
 					// Get NumberOfSeriesRelatedInstances ("0020,1209")
-					datos.NumberOfSeriesRelatedInstances = extractMsn(RespStdout, "0020,1209")
+					datos.NumberOfSeriesRelatedInstances = extractMsn(RespStdout, TagNumberSRI)
 
 					//  *********** Delete jsonmwl MPPSStatus and store jsonmpps **************
 					deleteFile(indexdb + f.Name())
@@ -131,14 +129,13 @@ func main() {
 					fmt.Printf("%+v", datos)
 
 					num++
-					//saveJson(pathJsonMpps+f.Name(), []byte(datos))
 
 				} else {
 					fmt.Println("MWL Study not found.")
 				}
 
-				// Set time to wait: 2 seconds
-				time.Sleep(2 * time.Second)
+				// Set time to wait: 5 Minutes
+				time.Sleep(elapsedT)
 
 			}
 		}

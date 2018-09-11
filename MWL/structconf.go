@@ -31,10 +31,11 @@ type ConfigMPPS struct {
 	NroTag       string
 	OptionsTags  string
 	JSONMppsPath string
+  ElapsedTime  int
 }
 
 // IndObj Struct for read, write or delete index
 type IndObj struct {
-	Names				 			 string
-	DateCreation 			 string
+	Names				 string
+	DateCreation string
 }

@@ -100,7 +100,7 @@ func get_filename(path string, db_path string, ind_path string) []string {
 
 			fmt.Printf("Database writing success\n")
 
-			create_indx(ind_path, fileXML[0]+".json", xmldata.Date)
+			create_indx(ind_path, fileXML[0] + ".json", xmldata.Date)
 
 			nameFiles = append(nameFiles, file_path)
 
@@ -133,9 +133,6 @@ func main() {
 	mwl_path := confFile.MwlPath
 	db_mwl := confFile.DBMwl
 	ind_path := confFile.Index
-	// probar read xml
-	// mwl_path := "C:/Users/mari/Documents/Resocentro/mwl_files/"
-	// db_mwl := "C:/Users/mari/Documents/Resocentro/DB_MWL/"
 
 	for {
 		files := get_filename(mwl_path, db_mwl, ind_path)
@@ -145,7 +142,7 @@ func main() {
 			fmt.Printf("No new MWL Studies\n")
 		}
 
-		// Set time to wait 500 ms
-		time.Sleep(500 * time.Millisecond)
+		// Set time to wait 5 Minutes
+		time.Sleep(5 * time.Minute)
 	}
 }
