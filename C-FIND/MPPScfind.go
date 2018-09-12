@@ -33,14 +33,22 @@ func main() {
 	json.Unmarshal(byteValue, &confFile)
 
 	ejecutable := confFile.Executable
+
+	// PACS Configuration
 	pacsaetitle := confFile.PacsAETitle
 	ip := confFile.PacsIP
 	port := confFile.PacsPort
+
+	// Entity Configuration
+	entityaetitle := confFile.ENTITYAETitle
+	entityip := confFile.ENTITYIP
+	entityport := confFile.ENTITYPort
+
 	Tag := confFile.NroTag
 	optcfind := confFile.OptionsTags
 
 	// revisar luego agregando el aetitle de la aplicacion
-	comando1 := ejecutable + "-c " + pacsaetitle + "@" + ip + ":" + port + " -m " + Tag + "="
+	comando1 := ejecutable + " " + "-b " + entityaetitle + "@" + entityip + ":" + entityport + " " + "-c " + pacsaetitle + "@" + ip + ":" + port + " -m " + Tag + "="
 	// *****************************************************************************************
 
 	// ************************ Set Paths: MWL, MPPS, ElapsedTime ******************************
