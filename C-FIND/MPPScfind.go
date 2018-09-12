@@ -1,3 +1,7 @@
+// Copyright 2018 Author: José FERRER VILLENA
+
+// This program read a json file, do query c-find to PACS and save selected DICOM Tags in json files
+// for Mirth Reading and query to Database.
 package main
 
 import (
@@ -35,15 +39,17 @@ func main() {
 	Tag := confFile.NroTag
 	optcfind := confFile.OptionsTags
 
+	// revisar luego agregando el aetitle de la aplicacion
 	comando1 := ejecutable + "-c " + pacsaetitle + "@" + ip + ":" + port + " -m " + Tag + "="
 	// *****************************************************************************************
 
 	// ************************ Set Paths: MWL, MPPS, ElapsedTime ******************************
 	dbmwl := confFile.DBMwl
 	dbmpps := confFile.JSONMppsPath
-	indexdb := confFile.Index
 	elapsedT := time.Duration(confFile.ElapsedTime) * time.Minute
 	// *****************************************************************************************
+
+	fmt.Println("Configuration Done.")
 
 	num := 0
 	datos := new(Tagdcm)
@@ -51,7 +57,7 @@ func main() {
 	for {
 
 		// ************************** Read .json files MWL *************************************
-		files, err := ioutil.ReadDir(indexdb)
+		files, err := ioutil.ReadDir(dbmwl)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -59,11 +65,13 @@ func main() {
 
 		// Analize only json files MWL
 		for _, f := range files {
-			filePath := dbmwl + "DB_MWL/" + f.Name()
+			filePath := dbmwl + f.Name()
 
 			// ************************** Open json file ***************************************
 			if filepath.Ext(filePath) == ".json" {
 
+				fmt.Println(filePath)
+				return
 				// Open our jsonFile
 				jsonFile, _ := os.Open(filePath)
 				// defer the closing of our xmlFile so that we can parse it later on
@@ -82,7 +90,7 @@ func main() {
 				studyID = jsondata.StudyNumbers
 
 				// ************************ Query C-FIND ****************************************
-				// Comando completo
+				// Comando completed
 				comando := comando1 + studyID + " " + optcfind
 
 				// Get C-Find cutting response
@@ -97,8 +105,6 @@ func main() {
 
 					// ********************** Extract Data ***************************************
 					// Get Struct dicom data tags and save jsonmpps
-					// Id Series
-					datos.IDSeries = int(num)
 					// Get AccessionNumber ("0008,0050")
 					datos.AccessionNumber = extractMsn(RespStdout, TagAccession)
 					// Get SeriesInstanceUID ("0020,000E")
@@ -121,7 +127,7 @@ func main() {
 					datos.NumberOfSeriesRelatedInstances = extractMsn(RespStdout, TagNumberSRI)
 
 					//  *********** Delete jsonmwl MPPSStatus and store jsonmpps **************
-					deleteFile(indexdb + f.Name())
+					deleteFile(dbmwl + f.Name())
 
 					//***************** Save JSON MPPS Data ***********************************
 					tagsJSON, _ := json.Marshal(datos)

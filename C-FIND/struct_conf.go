@@ -21,22 +21,22 @@ type DBmwl struct {
 
 // ConfigMPPS Struct of configuration MPPS C-FIND
 type ConfigMPPS struct {
-	MwlPath      string
-	DBMwl        string
-	Index        string
-	Executable   string
-	PacsAETitle  string
-	PacsIP       string
-	PacsPort     string
-	NroTag       string
-	OptionsTags  string
-	JSONMppsPath string
-	ElapsedTime  int
+	DBMwl        	string
+	Executable   	string
+	PacsAETitle  	string
+	PacsIP       	string
+	PacsPort     	string
+	ENTITYAETitle string
+	ENTITYIP			string
+	ENTITYPort		string
+	NroTag       	string
+	OptionsTags  	string
+	JSONMppsPath 	string
+	ElapsedTime  	int
 }
 
 // Tagdcm Struct of DICOM tags to get from C-FIND
 type Tagdcm struct {
-	IDSeries                       int    `json:"id_series"`
 	AccessionNumber                string `json:"accessionNumber"`
 	SeriesInstanceUID              string `json:"seriesinstanceUID"`
 	StudyInstanceUID               string `json:"studyinstanceUID"`
