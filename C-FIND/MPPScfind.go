@@ -8,10 +8,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
+	"strings" //borrar si es posible
+	"strconv"
 )
 
 func main() {
@@ -48,7 +49,7 @@ func main() {
 	optcfind := confFile.OptionsTags
 
 	// revisar luego agregando el aetitle de la aplicacion
-	comando1 := ejecutable + " " + "-b " + entityaetitle + "@" + entityip + ":" + entityport + " " + "-c " + pacsaetitle + "@" + ip + ":" + port + " -m " + Tag + "="
+	comando1 := ejecutable + " " + "-b " + entityaetitle + "@" + entityip + ":" + entityport + " " + "-c " + pacsaetitle + "@" + ip + ":" + port + " -L SERIES" + " -m " + Tag + "="
 	// *****************************************************************************************
 
 	// ************************ Set Paths: MWL, MPPS, ElapsedTime ******************************
@@ -67,7 +68,7 @@ func main() {
 		// ************************** Read .json files MWL *************************************
 		files, err := ioutil.ReadDir(dbmwl)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println("Error to Read JSONs files from MWL by ", err)
 		}
 		// *************************************************************************************
 
@@ -78,16 +79,20 @@ func main() {
 			// ************************** Open json file ***************************************
 			if filepath.Ext(filePath) == ".json" {
 
-				fmt.Println(filePath)
-				return
 				// Open our jsonFile
-				jsonFile, _ := os.Open(filePath)
+				jsonFile, err := os.Open(filePath)
+				if err != nil {
+					fmt.Println("Error to Read JSON ", filePath, " by ", err)
+				}
 				// defer the closing of our xmlFile so that we can parse it later on
 				defer jsonFile.Close()
 
 				// ********************* Read JSON File ****************************************
 				// read our opened jsonFile as a byte array.
-				byteValue, _ := ioutil.ReadAll(jsonFile)
+				byteValue, err := ioutil.ReadAll(jsonFile)
+				if err != nil {
+					fmt.Println("Error to Read JSON file and transfer as a byte array by ", err)
+				}
 
 				// we initialize our array
 				var jsondata DBmwl
@@ -97,12 +102,27 @@ func main() {
 				var studyID string
 				studyID = jsondata.StudyNumbers
 
+
 				// ************************ Query C-FIND ****************************************
 				// Comando completed
 				comando := comando1 + studyID + " " + optcfind
 
 				// Get C-Find cutting response
-				RespStdout := queryCFind(comando)
+				// %%%%%%%%%%%%%%%%%%%%%% borrar de aqui %%%%%%%%%%%%%%%%%%%%
+				var hola string
+				if studyID == "holaMundo" {
+					hola = queryCFind(comando)
+				} else {
+					b, err := ioutil.ReadFile("/Users/joseferrer/Desktop/Test/jueves 13092018/respuesta.txt") // just pass the file name
+				    if err != nil {
+				        fmt.Print(err)
+				    }
+
+				  hola = string(b)
+				}
+				RespStdout := hola
+				// %%%%%%%%%%%%%%%%%%%%%%% Hasta aqui %%%%%%%%%%%%%%%%%%%%%%%
+				//RespStdout := queryCFind(comando)
 				fmt.Println("The command has been executed: ", comando)
 
 				// ********************** Dicom validation query *********************************
@@ -111,36 +131,61 @@ func main() {
 				// Revisar logica del valResponse no le hace a todos
 				if validResp != "Study not found" {
 
-					// ********************** Extract Data ***************************************
-					// Get Struct dicom data tags and save jsonmpps
-					// Get AccessionNumber ("0008,0050")
-					datos.AccessionNumber = extractMsn(RespStdout, TagAccession)
-					// Get SeriesInstanceUID ("0020,000E")
-					datos.SeriesInstanceUID = extractMsn(RespStdout, TagSeriesInUID)
-					// Get StudyInstanceUID ("0020,000D")
-					datos.StudyInstanceUID = extractMsn(RespStdout, TagStudyInsUID)
-					// Get SeriesTime ("0008,0031")
-					datos.SeriesTime = extractMsn(RespStdout, TagSeriesTime)
-					// Get SeriesDate ("0008,0021")
-					datos.SeriesDate = extractMsn(RespStdout, TagSeriesDate)
-					// Get StudyDescription ("0008,1030")
-					datos.StudyDescription = extractMsn(RespStdout, TagStudyDesc)
-					// Get SeriesDescription ("0008,103E")
-					datos.SeriesDescription = extractMsn(RespStdout, TagSeriesDesc)
-					// Get SeriesNumber ("0020,0011")
-					datos.SeriesNumber = extractMsn(RespStdout, TagSeriesN)
-					// Get BodyPartExamined ("0018,0015")
-					datos.BodyPartExamined = extractMsn(RespStdout, TagBodyPart)
-					// Get NumberOfSeriesRelatedInstances ("0020,1209")
-					datos.NumberOfSeriesRelatedInstances = extractMsn(RespStdout, TagNumberSRI)
+					strMsn := RespStdout
+					var n int
+				  var strCut string
+
+					key := "status=ff00H"
+				  nSeries := strings.Count(strMsn, key)
+
+					for i := 0; i < nSeries; i++ {
+				    if i == 0 {
+				      strCut = strMsn
+				    } else {
+				      strCut = strMsn[n - (len(key)):len(strMsn)]
+
+				    }
+				    slice_Msn, m := cutMsn(strCut, key)
+				    n = m + n - (len(key)+1)
+						// ********************** Extract Data ***************************************
+						// Get Struct dicom data tags and save jsonmpps
+						// Get AccessionNumber ("0008,0050")
+						datos.AccessionNumber = extractMsn(slice_Msn, TagAccession)
+						// Get SeriesInstanceUID ("0020,000E")
+						datos.SeriesInstanceUID = extractMsn(slice_Msn, TagSeriesInUID)
+						// Get StudyInstanceUID ("0020,000D")
+						datos.StudyInstanceUID = extractMsn(slice_Msn, TagStudyInsUID)
+						// Get SeriesTime ("0008,0031")
+						datos.SeriesTime = extractMsn(slice_Msn, TagSeriesTime)
+						// Get SeriesDate ("0008,0021")
+						datos.SeriesDate = extractMsn(slice_Msn, TagSeriesDate)
+						// Get StudyDescription ("0008,1030")
+						datos.StudyDescription = extractMsn(slice_Msn, TagStudyDesc)
+						// Get SeriesDescription ("0008,103E")
+						datos.SeriesDescription = extractMsn(slice_Msn, TagSeriesDesc)
+						// Get SeriesNumber ("0020,0011")
+						datos.SeriesNumber = extractMsn(slice_Msn, TagSeriesN)
+						// Get BodyPartExamined ("0018,0015")
+						datos.BodyPartExamined = extractMsn(slice_Msn, TagBodyPart)
+						// Get NumberOfSeriesRelatedInstances ("0020,1209")
+						datos.NumberOfSeriesRelatedInstances = extractMsn(slice_Msn, TagNumberSRI)
+						// Get StationName ()
+						datos.StationName = extractMsn(slice_Msn, TagStationName)
+						fmt.Println(datos.StudyInstanceUID)
+
+						//***************** Save JSON MPPS Data ***********************************
+						tagsJSON, _ := json.Marshal(datos)
+						nameF := strings.Split(f.Name(),".")
+						err = ioutil.WriteFile(dbmpps + nameF[0] + "_" + strconv.Itoa(i) + ".json", tagsJSON, 0644)
+						if err != nil {
+							fmt.Println("Error to Write MPPS file by ", err)
+						}
+				  }
+
+					return
 
 					//  *********** Delete jsonmwl MPPSStatus and store jsonmpps **************
 					deleteFile(dbmwl + f.Name())
-
-					//***************** Save JSON MPPS Data ***********************************
-					tagsJSON, _ := json.Marshal(datos)
-					err = ioutil.WriteFile(dbmpps+f.Name(), tagsJSON, 0644)
-					fmt.Printf("%+v", datos)
 
 					num++
 

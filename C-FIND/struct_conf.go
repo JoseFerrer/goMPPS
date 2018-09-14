@@ -37,15 +37,15 @@ type ConfigMPPS struct {
 
 // Tagdcm Struct of DICOM tags to get from C-FIND
 type Tagdcm struct {
-	AccessionNumber                string `json:"accessionNumber"`
-	SeriesInstanceUID              string `json:"seriesinstanceUID"`
-	StudyInstanceUID               string `json:"studyinstanceUID"`
-	SeriesTime                     string `json:"seriestime"`
-	SeriesDate                     string `json:"seriesdate"`
-	StudyDescription               string `json:"studydescription"`
-	SeriesDescription              string `json:"seriesdescription"`
-	SeriesNumber                   string `json:"seriesnumber"`
-	BodyPartExamined               string `json:"bodypartexamined"`
-	NumberOfSeriesRelatedInstances string `json:"numberofseriesrelatedinstances"`
-	StationName                    string `json:"stationname"`
+	AccessionNumber                string `json:"AccessionNumber"`
+	SeriesInstanceUID              string `json:"SeriesInstanceUID"`
+	StudyInstanceUID               string `json:"StudyInstanceUID"`
+	SeriesTime                     string `json:"seriesTime"`
+	SeriesDate                     string `json:"SeriesDate"`
+	StudyDescription               string `json:"StudyDescription"`
+	SeriesDescription              string `json:"SeriesDescription"`
+	SeriesNumber                   string `json:"SeriesNumber"`
+	BodyPartExamined               string `json:"bodyPartExamined"`
+	NumberOfSeriesRelatedInstances string `json:"numberOfSeriesRelatedInstances"`
+	StationName                    string `json:"StationName"`
 }

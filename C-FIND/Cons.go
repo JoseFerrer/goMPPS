@@ -35,3 +35,6 @@ const TagBodyPart = "0018,0015"
 
 // TagNumberSRI DICOM Tag to read
 const TagNumberSRI = "0020,1209"
+
+// TagStationName DICOM Tag to read
+const TagStationName = "0008,1010"

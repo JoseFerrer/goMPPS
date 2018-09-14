@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -11,24 +10,19 @@ import (
 func deleteFile(path string) {
 	err := os.Remove(path)
 	if err != nil {
-		fmt.Println("It is not possible to delete the file ", path)
-		fmt.Println(err)
+		fmt.Println("It is not possible to delete the file ", path, " by ", err)
 	}
 }
 
 func extractMsn(msn string, key string) string {
 
 	indx := strings.Index(msn, key)
-	// fmt.Println(indx)
 	if indx != -1 {
 		indxi := getIndx(msn, indx, "[")
-		//fmt.Println("Inicio: ", indxi)
 		indxf := getIndx(msn, indxi, "]")
-		//fmt.Println("Fin: ", indxf)
 		if indxi == indxf-1 {
 			return "Tag empty"
 		}
-		//fmt.Println(string(msn[indxi:indxf]))
 		return msn[indxi+1 : indxf]
 	}
 	return "No Tag in DICOM object"
@@ -43,23 +37,26 @@ func valResponse(msn string, key string) string {
 
 }
 
-func cutMsn(msn string, key string) string {
+func cutMsn(msn string, key string) (string, int) {
 
-	indx := strings.Index(msn, key)
-	ix := indx + len(key)
-	return msn[ix:len(msn)]
+	indx1 := strings.Index(msn, key)
+	ix := indx1 + len(key)
+  cutmessage := msn[ix:len(msn)]
+  indx2 := strings.Index(cutmessage, key)
+	if indx2 == -1 {
+		indx2 = strings.Index(cutmessage, "status=0H")
+	}
+  indexf := ix + indx2 + len(key)
+  return cutmessage[0:indx2], indexf
 
 }
 
 func getIndx(msn string, indx int, chr string) int {
 
 	inx := 1
-	//fmt.Println("El primer index: ", indx)
 	for {
 		chrt := msn[indx+inx]
 		if string(chrt) == chr {
-			//fmt.Println("Valor: ", indx + inx)
-			//fmt.Println(string(msn[indx +inx]))
 			break
 		}
 		inx++
@@ -74,12 +71,8 @@ func queryCFind(path string) string {
 	cmd := exec.Command("cmd", "/C", path)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("cmd.Run() failedwith %s\n", err)
+		fmt.Println("cmd.Run() failedwith %s\n", err)
 	}
 
-	// Obtener la salida de FINDSCU
-	msndcm := string(out)
-	lastTag := "NumberOfSeriesRelatedInstances"
-	mensajedcm := cutMsn(msndcm, lastTag)
-	return mensajedcm
+	return string(out)
 }
