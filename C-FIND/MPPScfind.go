@@ -108,21 +108,7 @@ func main() {
 				comando := comando1 + studyID + " " + optcfind
 
 				// Get C-Find cutting response
-				// %%%%%%%%%%%%%%%%%%%%%% borrar de aqui %%%%%%%%%%%%%%%%%%%%
-				var hola string
-				if studyID == "holaMundo" {
-					hola = queryCFind(comando)
-				} else {
-					b, err := ioutil.ReadFile("/Users/joseferrer/Desktop/Test/jueves 13092018/respuesta.txt") // just pass the file name
-				    if err != nil {
-				        fmt.Print(err)
-				    }
-
-				  hola = string(b)
-				}
-				RespStdout := hola
-				// %%%%%%%%%%%%%%%%%%%%%%% Hasta aqui %%%%%%%%%%%%%%%%%%%%%%%
-				//RespStdout := queryCFind(comando)
+				RespStdout := queryCFind(comando)
 				fmt.Println("The command has been executed: ", comando)
 
 				// ********************** Dicom validation query *********************************
