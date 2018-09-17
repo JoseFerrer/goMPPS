@@ -1,34 +1,24 @@
 # goMPPS
-Dicom MPPS API for Mirth Connect usign [MirthConnect](https://www.nextgen.com/products-and-services/integration-engine) and [dcm4chee tool kit](https://sourceforge.net/projects/dcm4che/files/dcm4chee-arc-light5/)
+Dicom MPPS API for [MirthConnect](https://www.nextgen.com/products-and-services/integration-engine) using findscu of [dcm4chee tool kit](https://sourceforge.net/projects/dcm4che/files/dcm4chee-arc-light5/)
 
-## Modules
-
-* MWL: Query Modality WorkList Module to Database
-* C-FIND: Query c-Find Module for MPPS
-
-## Get c-find studies
-
-
-
-## Get Modality WorkList
-
-
+## Get C-Find studies
+This Application perform C-Find SCU queries with Series retrieve level to simulate MPPS based in configuration file
 
 ## Configuration JSON
+This JSON provide the configuration:
 
-This JSON provide to Modules the configuration for Modules
-
-* MWLPath: File Path where Mirth Connect save the XML file coming from RIS
-* DBMWL: Modality WorkList JSON database
-* Index: Study Index database
+* DBMWL: File Path where Mirth Connect save the XML file coming from RIS
 * executable: Path of dcm4chee findscu
 * PACSAETitle: AETitle of PACS target
 * PACSIP: PACS target IP
 * PACSPort: PACS target port
+* ENTITYAETitle: AETitle of Entity findscu 
+* ENTITYIP: Entity source IP
+* ENTITYPort: Entity source Port
 * NroTag: DICOM Tag for matching key
 * OptionsTags: DICOMs Tag for Specify returning key
 * JSONMPPSPath: MPPS JSON database
-* ElapsedTime: Time for Queries to Database
+* ElapsedTime: Time for Queries to Database in seconds
 
 ```
 {
