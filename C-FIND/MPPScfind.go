@@ -10,9 +10,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
-	"strings" //borrar si es posible
 	"strconv"
+	"strings" //borrar si es posible
+	"time"
 )
 
 func main() {
@@ -23,9 +23,10 @@ func main() {
 	if err != nil {
 		fmt.Println("JSON File Configuration is not found. ", err)
 	}
-	fmt.Println("Successfully Openend configuration.json")
+	fmt.Println("Successfully Opened configuration.json")
 	defer jsonFile.Close()
 	// Read our opened jsonFile as a byte array
+	fmt.Println("DEspues de defer")
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	// we initialize our ConfigMPPS
 	var confFile ConfigMPPS
@@ -66,34 +67,30 @@ func main() {
 	for {
 
 		// ************************** Read .json files MWL *************************************
-		files, err := ioutil.ReadDir(dbmwl)
-		if err != nil {
-			fmt.Println("Error to Read JSONs files from MWL by ", err)
-		}
-		// *************************************************************************************
+		var files []string
 
+		err := filepath.Walk(dbmwl, func(path string, info os.FileInfo, err error) error {
+			files = append(files, path)
+			return nil
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		// *************************************************************************************
 		// Analize only json files MWL
 		for _, f := range files {
-			filePath := dbmwl + f.Name()
+			nameFSlice := strings.Split(f, "DBMWL")
+			nFile := nameFSlice[1]
+			n2save := nFile[1:len(nFile)]
+			filePath := f
+			fmt.Println(filePath)
+			fmt.Println(n2save)
 
 			// ************************** Open json file ***************************************
 			if filepath.Ext(filePath) == ".json" {
 
-				// Open our jsonFile
-				jsonFile, err := os.Open(filePath)
-				if err != nil {
-					fmt.Println("Error to Read JSON ", filePath, " by ", err)
-				}
-				// defer the closing of our xmlFile so that we can parse it later on
-				defer jsonFile.Close()
-
-				// ********************* Read JSON File ****************************************
-				// read our opened jsonFile as a byte array.
-				byteValue, err := ioutil.ReadAll(jsonFile)
-				if err != nil {
-					fmt.Println("Error to Read JSON file and transfer as a byte array by ", err)
-				}
-
+				byteValue := readFile(filePath)
 				// we initialize our array
 				var jsondata DBmwl
 				// we unmarshal our byteArray which contains our
@@ -101,7 +98,6 @@ func main() {
 				json.Unmarshal(byteValue, &jsondata)
 				var studyID string
 				studyID = jsondata.StudyNumbers
-
 
 				// ************************ Query C-FIND ****************************************
 				// Comando completed
@@ -114,25 +110,26 @@ func main() {
 				// ********************** Dicom validation query *********************************
 				validResp := valResponse(RespStdout, respFromPacs)
 
+
 				// Revisar logica del valResponse no le hace a todos
 				if validResp != "Study not found" {
 
 					strMsn := RespStdout
 					var n int
-				  var strCut string
+					var strCut string
 
 					key := "status=ff00H"
-				  nSeries := strings.Count(strMsn, key)
+					nSeries := strings.Count(strMsn, key)
 
 					for i := 0; i < nSeries; i++ {
-				    if i == 0 {
-				      strCut = strMsn
-				    } else {
-				      strCut = strMsn[n - (len(key)):len(strMsn)]
+						if i == 0 {
+							strCut = strMsn
+						} else {
+							strCut = strMsn[n-(len(key)) : len(strMsn)]
 
-				    }
-				    slice_Msn, m := cutMsn(strCut, key)
-				    n = m + n - (len(key)+1)
+						}
+						slice_Msn, m := cutMsn(strCut, key)
+						n = m + n - (len(key) + 1)
 						// ********************** Extract Data ***************************************
 						// Get Struct dicom data tags and save jsonmpps
 						// Get AccessionNumber ("0008,0050")
@@ -157,21 +154,19 @@ func main() {
 						datos.NumberOfSeriesRelatedInstances = extractMsn(slice_Msn, TagNumberSRI)
 						// Get StationName ()
 						datos.StationName = extractMsn(slice_Msn, TagStationName)
-						fmt.Println(datos.StudyInstanceUID)
 
 						//***************** Save JSON MPPS Data ***********************************
 						tagsJSON, _ := json.Marshal(datos)
-						nameF := strings.Split(f.Name(),".")
-						err = ioutil.WriteFile(dbmpps + nameF[0] + "_" + strconv.Itoa(i) + ".json", tagsJSON, 0644)
+						nameF := strings.Split(n2save, ".")
+						err = ioutil.WriteFile(dbmpps+nameF[0]+"_"+strconv.Itoa(i)+".json", tagsJSON, 0644)
 						if err != nil {
 							fmt.Println("Error to Write MPPS file by ", err)
 						}
-				  }
-
-					return
+					}
 
 					//  *********** Delete jsonmwl MPPSStatus and store jsonmpps **************
-					deleteFile(dbmwl + f.Name())
+					fmt.Println(dbmwl + n2save)
+					deleteFile(dbmwl + n2save)
 
 					num++
 
@@ -179,11 +174,14 @@ func main() {
 					fmt.Println("MWL Study not found.")
 				}
 
-				// Set time to wait: 5 Minutes
-				time.Sleep(elapsedT)
-
+			} else {
+				fmt.Println("No JSON Modality WorkList found.")
 			}
 		}
+
+		// Set time to wait: 5 Minutes
+		fmt.Println("Waiting some Minutes")
+		time.Sleep(elapsedT)
 	}
 
 }

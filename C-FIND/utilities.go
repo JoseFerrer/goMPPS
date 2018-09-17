@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"io/ioutil"
 )
 
 func deleteFile(path string) {
@@ -14,6 +15,25 @@ func deleteFile(path string) {
 	}
 }
 
+func readFile(filePath string) []byte {
+	// Open our jsonFile
+	jsonFile, err := os.OpenFile(filePath, os.O_RDWR, 0644)
+		if err != nil {
+			fmt.Println("Error to Read JSON ", filePath, " by ", err)
+		}
+		// defer the closing of our xmlFile so that we can parse it later on
+		defer jsonFile.Close()
+				
+
+		// ********************* Read JSON File ****************************************
+		// read our opened jsonFile as a byte array.
+		byteValue, err := ioutil.ReadAll(jsonFile)
+		if err != nil {
+			fmt.Println("Error to Read JSON file and transfer as a byte array by ", err)
+		}
+		return byteValue
+}
+
 func extractMsn(msn string, key string) string {
 
 	indx := strings.Index(msn, key)
@@ -21,11 +41,11 @@ func extractMsn(msn string, key string) string {
 		indxi := getIndx(msn, indx, "[")
 		indxf := getIndx(msn, indxi, "]")
 		if indxi == indxf-1 {
-			return "Tag empty"
+			return ""
 		}
 		return msn[indxi+1 : indxf]
 	}
-	return "No Tag in DICOM object"
+	return ""
 }
 
 func valResponse(msn string, key string) string {
@@ -41,13 +61,13 @@ func cutMsn(msn string, key string) (string, int) {
 
 	indx1 := strings.Index(msn, key)
 	ix := indx1 + len(key)
-  cutmessage := msn[ix:len(msn)]
-  indx2 := strings.Index(cutmessage, key)
+	cutmessage := msn[ix:len(msn)]
+	indx2 := strings.Index(cutmessage, key)
 	if indx2 == -1 {
 		indx2 = strings.Index(cutmessage, "status=0H")
 	}
-  indexf := ix + indx2 + len(key)
-  return cutmessage[0:indx2], indexf
+	indexf := ix + indx2 + len(key)
+	return cutmessage[0:indx2], indexf
 
 }
 
