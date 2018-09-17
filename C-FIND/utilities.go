@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 )
 
+// Function deleteFile: Delete file from string input path
 func deleteFile(path string) {
 	err := os.Remove(path)
 	if err != nil {
@@ -15,6 +16,8 @@ func deleteFile(path string) {
 	}
 }
 
+// Function readFile: Read flie from string input path and return a byte array of
+// json file content
 func readFile(filePath string) []byte {
 	// Open our jsonFile
 	jsonFile, err := os.OpenFile(filePath, os.O_RDWR, 0644)
@@ -23,7 +26,7 @@ func readFile(filePath string) []byte {
 		}
 		// defer the closing of our xmlFile so that we can parse it later on
 		defer jsonFile.Close()
-				
+
 
 		// ********************* Read JSON File ****************************************
 		// read our opened jsonFile as a byte array.
@@ -34,6 +37,8 @@ func readFile(filePath string) []byte {
 		return byteValue
 }
 
+// Function extractMsn: Extract Tags DICOM from string Stdoutput using the key tag
+// DICOM string, the output is a string output of DICOMs tags
 func extractMsn(msn string, key string) string {
 
 	indx := strings.Index(msn, key)
@@ -48,6 +53,7 @@ func extractMsn(msn string, key string) string {
 	return ""
 }
 
+// Function valResponse: Validation response of studies in PACS
 func valResponse(msn string, key string) string {
 	indx := strings.Index(msn, key)
 	if indx == -1 {
@@ -57,6 +63,8 @@ func valResponse(msn string, key string) string {
 
 }
 
+// Function cutMsn: This function cut the slice of response by Series
+// return this slice of string and the last index position
 func cutMsn(msn string, key string) (string, int) {
 
 	indx1 := strings.Index(msn, key)
@@ -71,6 +79,7 @@ func cutMsn(msn string, key string) (string, int) {
 
 }
 
+// Function getIndx: extract of tag information
 func getIndx(msn string, indx int, chr string) int {
 
 	inx := 1
@@ -85,9 +94,11 @@ func getIndx(msn string, indx int, chr string) int {
 	return (indx + inx)
 }
 
+// Function queryCFind: Function that execute query C-Find to PACs and return
+// the respnse in string
 func queryCFind(path string) string {
 
-	// Ejecutar FINDSCU
+	// Execute FINDSCU
 	cmd := exec.Command("cmd", "/C", path)
 	out, err := cmd.CombinedOutput()
 	if err != nil {

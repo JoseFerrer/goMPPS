@@ -118,18 +118,17 @@ func main() {
 					var n int
 					var strCut string
 
-					key := "status=ff00H"
-					nSeries := strings.Count(strMsn, key)
+					nSeries := strings.Count(strMsn, respFromPacs)
 
 					for i := 0; i < nSeries; i++ {
 						if i == 0 {
 							strCut = strMsn
 						} else {
-							strCut = strMsn[n-(len(key)) : len(strMsn)]
+							strCut = strMsn[n-(len(respFromPacs)) : len(strMsn)]
 
 						}
-						slice_Msn, m := cutMsn(strCut, key)
-						n = m + n - (len(key) + 1)
+						slice_Msn, m := cutMsn(strCut, respFromPacs)
+						n = m + n - (len(respFromPacs) + 1)
 						// ********************** Extract Data ***************************************
 						// Get Struct dicom data tags and save jsonmpps
 						// Get AccessionNumber ("0008,0050")
